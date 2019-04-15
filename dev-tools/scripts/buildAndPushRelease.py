@@ -103,7 +103,7 @@ def prepare(root, version, gpgKeyID, gpgPassword):
   log('\nGIT rev: %s\n' % rev)
 
   print('  Check DOAP files')
-  checkDOAPfiles(version)
+  # checkDOAPfiles(version)
 
   print('  ant clean jar jar-src precommit validate documentation-lint')
   run('ant clean jar jar-src precommit validate documentation-lint')
