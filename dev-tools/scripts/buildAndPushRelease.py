@@ -105,8 +105,8 @@ def prepare(root, version, gpgKeyID, gpgPassword):
   print('  Check DOAP files')
   # checkDOAPfiles(version)
 
-  print('  ant clean jar jar-src precommit validate documentation-lint')
-  run('ant clean jar jar-src precommit validate documentation-lint')
+  print('  ant clean precommit')
+  run('ant clean precommit')
 
   open('rev.txt', mode='wb').write(rev.encode('UTF-8'))
   
