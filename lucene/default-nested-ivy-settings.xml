@@ -22,38 +22,29 @@
 
   <settings defaultResolver="default"/>
 
-  <property name="local-maven2-dir" value="${user.home}/.m2/repository/" />
+  <property name="local-maven2-dir" value="${user.home}/.m2/repository/"/>
 
   <include url="${ivy.default.settings.dir}/ivysettings-public.xml"/>
   <include url="${ivy.default.settings.dir}/ivysettings-shared.xml"/>
   <include url="${ivy.default.settings.dir}/ivysettings-local.xml"/>
   <include url="${ivy.default.settings.dir}/ivysettings-main-chain.xml"/>
 
-  <caches lockStrategy="${ivy.lock-strategy}" resolutionCacheDir="${ivy.resolution-cache.dir}" />
+  <caches lockStrategy="${ivy.lock-strategy}" resolutionCacheDir="${ivy.resolution-cache.dir}"/>
 
   <resolvers>
-    <ibiblio name="sonatype-releases" root="https://oss.sonatype.org/content/repositories/releases" m2compatible="true" />
-    <ibiblio name="maven.restlet.org" root="http://maven.restlet.org" m2compatible="true" />
-    <ibiblio name="releases.cloudera.com" root="http://repository.cloudera.com/content/repositories/releases" m2compatible="true" />
-
-    <!-- you might need to tweak this from china so it works -->
-    <ibiblio name="working-chinese-mirror" root="http://uk.maven.org/maven2" m2compatible="true" />
-
-    <filesystem name="local-maven-2" m2compatible="true" local="true">
-      <artifact
-          pattern="${local-maven2-dir}/[organisation]/[module]/[revision]/[module]-[revision].[ext]" />
-      <ivy
-          pattern="${local-maven2-dir}/[organisation]/[module]/[revision]/[module]-[revision].pom" />
-    </filesystem>
+    <ibiblio name="repo1-cache" root="http://artprod.dev.bloomberg.com/artifactory/central.maven.org-maven2-cache/"
+             m2compatible="true"/>
+    <ibiblio name="libs-release-local" root="https://artprod.dev.bloomberg.com/artifactory/libs-release-local"
+             m2compatible="true"/>
+    <ibiblio name="libs-release" root="https://artprod.dev.bloomberg.com/artifactory/libs-release" m2compatible="true"/>
+    <ibiblio name="remote-repos" root="http://artprod.dev.bloomberg.com/artifactory/remote-repos/" m2compatible="true"/>
 
     <chain name="default" returnFirst="true" checkmodified="true" changingPattern=".*SNAPSHOT">
       <resolver ref="local"/>
-      <!-- <resolver ref="local-maven-2" /> -->
-      <resolver ref="main"/>
-      <resolver ref="maven.restlet.org" />
-      <resolver ref="sonatype-releases" />
-      <resolver ref="releases.cloudera.com"/>
-      <resolver ref="working-chinese-mirror" />
+      <resolver ref="remote-repos"/>
+      <resolver ref="repo1-cache"/>
+      <resolver ref="libs-release-local"/>
+      <resolver ref="libs-release"/>
     </chain>
   </resolvers>
 
