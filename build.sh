@@ -16,7 +16,7 @@ RELEASE_BUILD_LOGFILE="/tmp/build.log"
 BUILD=""
 RELEASE_VERSION=""
 RELEASE_FOLDER=""
-RC_NUM=0
+RELEASE_RECUT_NUMBER=0
 LOGFILE=""
 
 function log () {
@@ -57,11 +57,11 @@ function prepare () {
     LAST_RC_NUM=$(ls -lt ${REL_BASE_DIR} | awk '{print $9}'| grep "${RC_RELEASE_VERSION}" | head -1 | cut -c ${RC_RELEASE_VERSION_LEN}-)
   fi
   if [[ ${BUILD} == ${RC_BUILD_MODE} ]] ; then
-    RC_NUM=$(($LAST_RC_NUM + 1))
+    RELEASE_RECUT_NUMBER=$(($LAST_RC_NUM + 1))
   else
-    RC_NUM=$LAST_RC_NUM
+    RELEASE_RECUT_NUMBER=$LAST_RC_NUM
   fi
-  RELEASE_FOLDER="${REL_BASE_DIR}/${RELEASE_VERSION}-RC${RC_NUM}"
+  RELEASE_FOLDER="${REL_BASE_DIR}/${RELEASE_VERSION}-RC${RELEASE_RECUT_NUMBER}"
 
   log "Starting with following variables: "
   log "    Base Directory    : ${BASEDIR}"
@@ -127,7 +127,7 @@ function buildAndTest () {
   fi
   # Prepare for Release
   log "Build and prepare Lucene/Solr...."
-  local COMMAND_TO_EXECUTE="python3 -u dev-tools/scripts/buildAndPushRelease.py --push-local ${RELEASE_FOLDER} --rc-num ${RC_NUM} --root ${BASEDIR}"
+  local COMMAND_TO_EXECUTE="python3 -u dev-tools/scripts/buildAndPushRelease.py --push-local ${RELEASE_FOLDER} --rc-num ${RELEASE_RECUT_NUMBER} --root ${BASEDIR}"
   executeCommand ${COMMAND_TO_EXECUTE}
   local ERROR_CODE=${?}
   if [[ ${ERROR_CODE} == 0 ]] ; then
@@ -139,19 +139,20 @@ function buildAndTest () {
 
 function pushToMaven () {
   local BASEDIR="${1}"
+  local RELEASE_REVISION=`cat ${BASEDIR}/rev.txt`
+  local RELEASE_REV_FOLDER="${RELEASE_FOLDER}/lucene-solr-${RELEASE_VERSION}-RC${RELEASE_RECUT_NUMBER}-rev${RELEASE_REVISION}"
   # Stage POM for lucene deployment
-  cd ${BASEDIR}/lucene
+  cd ${RELEASE_REV_FOLDER}/lucene
   log "Push lucene to Maven..."
-  #-Dmaven.dist.dir=${RELEASE_FOLDER}/solr/maven/
-  local COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} ${BVS_OPTIONS}"
+  local COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} ${BVS_OPTIONS} -Dmaven.dist.dir=${RELEASE_REV_FOLDER}/lucene/maven/"
   executeCommand ${COMMAND_TO_EXECUTE}
   local ERROR_CODE=${?}
   if [[ ${ERROR_CODE} == 0 ]] ; then
     log "Lucene pushed to Maven."
     # Stage POM for SOLR deployment
-    cd ${BASEDIR}/solr
+    cd ${RELEASE_REV_FOLDER}/solr
     log "Push solr to Maven..."
-    COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} ${BVS_OPTIONS}"
+    COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} ${BVS_OPTIONS} -Dmaven.dist.dir=${RELEASE_REV_FOLDER}/solr/maven/"
     executeCommand ${COMMAND_TO_EXECUTE}
     ERROR_CODE=${?}
     if [[ ${ERROR_CODE} == 0 ]] ; then
