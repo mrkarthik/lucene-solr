@@ -11,10 +11,13 @@ RC_BUILD_MODE="build"
 RC_REBUILD_MODE="rebuild"
 RC_NOBUILD_MODE="nobuild"
 RELEASE_LOGFILE="/tmp/release.log"
+RELEASE_BUILD_LOGFILE="/tmp/build.log"
 
 BUILD=""
 RELEASE_VERSION=""
 RELEASE_FOLDER=""
+RC_NUM=0
+LOGFILE=""
 
 function log () {
   echo "$(date +'%m-%d-%Y %T') ${1}"
@@ -27,8 +30,8 @@ function pause () {
 function executeCommand () {
   local COMMAND="${*}"
   log "Running ${COMMAND}..."
-  echo "Running ${COMMAND}..." >> ${RELEASE_LOGFILE} 2>&1
-  ${COMMAND} >> ${RELEASE_LOGFILE} 2>&1
+  echo "Running ${COMMAND}..." >> ${LOGFILE} 2>&1
+  ${COMMAND} >> ${LOGFILE} 2>&1
   local ERROR_CODE=${?}
   if [[ ${ERROR_CODE} != 0 ]]; then
     log "Error when executing ${COMMAND}"
@@ -39,8 +42,6 @@ function executeCommand () {
 
 function prepare () {
   log "Preparing for Lucene/Solr Build...."
-  rm rev.txt &> /dev/null
-  rm /tmp/release.log &> /dev/null
   if [[ ${BUILD} = ${RC_REBUILD_MODE} ]] ; then
     log "Removing Ant and Ivy Folders before build."
     rm -rf ~/.ant
@@ -49,8 +50,22 @@ function prepare () {
   local BASEDIR="${1}"
   local REL_BASE_DIR="/tmp/releases"
   RELEASE_VERSION=$(grep "version.base=" ${BASEDIR}/lucene/version.properties | cut -d'=' -f2)
+  local RC_RELEASE_VERSION=${RELEASE_VERSION}-RC
+  local RC_RELEASE_VERSION_LEN=$(echo ${RC_RELEASE_VERSION} | wc -c)
+  local LAST_RC_NUM=0
+  if [[ -d "${REL_BASE_DIR}" ]]; then
+    LAST_RC_NUM=$(ls -lt ${REL_BASE_DIR} | awk '{print $9}'| grep "${RC_RELEASE_VERSION}" | head -1 | cut -c ${RC_RELEASE_VERSION_LEN}-)
+  fi
+  if [[ ${BUILD} == ${RC_BUILD_MODE} ]] ; then
+    RC_NUM=$(($LAST_RC_NUM + 1))
+  else
+    RC_NUM=$LAST_RC_NUM
+  fi
+  RELEASE_FOLDER="${REL_BASE_DIR}/${RELEASE_VERSION}-RC${RC_NUM}"
+
   log "Starting with following variables: "
   log "    Base Directory    : ${BASEDIR}"
+  log "    Release Directory : ${RELEASE_FOLDER}"
 
   if [[ ${BUILD} == ${RC_NOBUILD_MODE} ]] ; then
     if [[ ! -d ${RELEASE_FOLDER} ]] ; then
@@ -69,7 +84,7 @@ function prepare () {
   return 0;
 }
 
-function buildAndTest () {
+function buildAndTestWitAnt () {
   local BASEDIR="${1}"
   if [[ ${BUILD} == ${RC_NOBUILD_MODE} ]] ; then
     log "Skipping Build and Test...."
@@ -78,7 +93,7 @@ function buildAndTest () {
   # Prepare for Release
   log "Build Lucene/Solr...."
   local COMMAND_TO_EXECUTE="ant clean precommit"
-  #executeCommand ${COMMAND_TO_EXECUTE}
+  executeCommand ${COMMAND_TO_EXECUTE}
   local ERROR_CODE=${?}
   if [[ ${ERROR_CODE} == 0 ]] ; then
     BVS_OPTIONS="-Ddev.version.suffix=${VERSION_SUFFIX}"
@@ -99,6 +114,24 @@ function buildAndTest () {
         log "Solr ready for release"
       fi
     fi
+  fi
+
+  return ${ERROR_CODE};
+}
+
+function buildAndTest () {
+  local BASEDIR="${1}"
+  if [[ ${BUILD} == ${RC_NOBUILD_MODE} ]] ; then
+    log "Skipping Build and Test...."
+    return 0;
+  fi
+  # Prepare for Release
+  log "Build and prepare Lucene/Solr...."
+  local COMMAND_TO_EXECUTE="python3 -u dev-tools/scripts/buildAndPushRelease.py --push-local ${RELEASE_FOLDER} --rc-num ${RC_NUM} --root ${BASEDIR}"
+  executeCommand ${COMMAND_TO_EXECUTE}
+  local ERROR_CODE=${?}
+  if [[ ${ERROR_CODE} == 0 ]] ; then
+    log "Lucene/Solr package ready."
   fi
 
   return ${ERROR_CODE};
@@ -145,9 +178,15 @@ function logStatus () {
 }
 
 function main() {
+  # Clean up
+  clear
+  rm rev.txt &> /dev/null
+  rm ${RELEASE_LOGFILE} &> /dev/null
+  rm ${RELEASE_BUILD_LOGFILE} &> /dev/null
+
   # Arguments
   if [[ $# -gt 0 ]] ; then
-    log "Starting ${0} with ${*}..."
+    log "Starting ${0} with Arguments ${*}..."
   else
     log "Starting ${0}..."
   fi
@@ -155,6 +194,14 @@ function main() {
   if [[ "${1}" == "--help" ]] ; then
       log "Usage: ${0} [build (true or false) or rebuild]"
       exit 1
+  fi
+
+  if [[ "${1}" == "ANT" ]] ; then
+    local BUILD_TYPE="${1}"
+    LOGFILE=${RELEASE_LOGFILE}
+    shift
+  else
+    LOGFILE=${RELEASE_BUILD_LOGFILE}
   fi
 
   if [[ "${1}" == "false" ]] ; then
@@ -170,7 +217,11 @@ function main() {
   prepare ${BASEDIR}
   local ERROR_CODE=${?}
   if [[ ${ERROR_CODE} == 0 ]] ; then
-    buildAndTest ${BASEDIR}
+    if [[ "${BUILD_TYPE}" == "ANT" ]] ; then
+      buildAndTestWitAnt ${BASEDIR}
+    else
+      buildAndTest ${BASEDIR}
+    fi
     ERROR_CODE=${?}
     if [[ ${ERROR_CODE} == 0 ]] ; then
       pushToMaven ${BASEDIR}
