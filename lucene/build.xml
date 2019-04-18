@@ -428,9 +428,9 @@
   <target name="generate-maven-artifacts" depends="-unpack-lucene-tgz">
     <ant dir=".." target="resolve" inheritall="false"/>
     <antcall target="-filter-pom-templates" inheritall="false"/>
-    <!--<antcall target="-dist-maven" inheritall="false">
+    <antcall target="-dist-maven" inheritall="false">
       <propertyset refid="uptodate.and.compiled.properties"/>
-    </antcall>-->
+    </antcall>
   </target>
   
   <target name="-validate-maven-dependencies" depends="compile-tools, install-maven-tasks, load-custom-tasks">
