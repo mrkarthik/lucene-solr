@@ -80,6 +80,8 @@ function prepare () {
       return 1;
     fi
   fi
+  BVS_OPTIONS="-Ddev.version.suffix=${VERSION_SUFFIX}"
+  MAVEN_OPTIONS="-Dm2.repository.id=${REPOSITORY_ID} -Dm2.repository.url=${REPOSITORY_URL} -Dm2.repository.username=${REPOSITORY_USERNAME} -Dm2.repository.password=${REPOSITORY_PASSWORD}"
 
   return 0;
 }
@@ -96,8 +98,6 @@ function buildAndTestWitAnt () {
   executeCommand ${COMMAND_TO_EXECUTE}
   local ERROR_CODE=${?}
   if [[ ${ERROR_CODE} == 0 ]] ; then
-    BVS_OPTIONS="-Ddev.version.suffix=${VERSION_SUFFIX}"
-    MAVEN_OPTIONS="-Dm2.repository.id=${REPOSITORY_ID} -Dm2.repository.url=${REPOSITORY_URL} -Dm2.repository.username=${REPOSITORY_USERNAME} -Dm2.repository.password=${REPOSITORY_PASSWORD}"
     log "Preparing Lucene for release..."
     cd ${BASEDIR}/lucene
     COMMAND_TO_EXECUTE="ant prepare-release-no-sign ${MAVEN_OPTIONS} ${BVS_OPTIONS}"
@@ -142,7 +142,7 @@ function pushToMaven () {
   local RELEASE_REVISION=`cat ${BASEDIR}/rev.txt`
   local RELEASE_REV_FOLDER="${RELEASE_FOLDER}/lucene-solr-${RELEASE_VERSION}-RC${RELEASE_RECUT_NUMBER}-rev${RELEASE_REVISION}"
   # Stage POM for lucene deployment
-  cd ${RELEASE_REV_FOLDER}/lucene
+  cd ${BASEDIR}/lucene
   log "Push lucene to Maven..."
   local COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} ${BVS_OPTIONS} -Dmaven.dist.dir=${RELEASE_REV_FOLDER}/lucene/maven/"
   executeCommand ${COMMAND_TO_EXECUTE}
@@ -150,7 +150,7 @@ function pushToMaven () {
   if [[ ${ERROR_CODE} == 0 ]] ; then
     log "Lucene pushed to Maven."
     # Stage POM for SOLR deployment
-    cd ${RELEASE_REV_FOLDER}/solr
+    cd ${BASEDIR}/solr
     log "Push solr to Maven..."
     COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} ${BVS_OPTIONS} -Dmaven.dist.dir=${RELEASE_REV_FOLDER}/solr/maven/"
     executeCommand ${COMMAND_TO_EXECUTE}
