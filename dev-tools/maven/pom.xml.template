@@ -140,9 +140,6 @@
 @lucene.solr.dependency.management@
     </dependencies>
   </dependencyManagement>
-  <prerequisites>
-    <maven>2.2.1</maven>
-  </prerequisites>
   <dependencies>
     <dependency> 
       <groupId>junit</groupId>
