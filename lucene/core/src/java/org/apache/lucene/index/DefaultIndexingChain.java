@@ -105,10 +105,10 @@ final class DefaultIndexingChain extends DocConsumer {
       PerField perField = getPerField(sortField.getField());
       if (perField != null && perField.docValuesWriter != null &&
           finishedDocValues.contains(perField.fieldInfo.name) == false) {
-          perField.docValuesWriter.finish(state.segmentInfo.maxDoc());
-          Sorter.DocComparator cmp = perField.docValuesWriter.getDocComparator(state.segmentInfo.maxDoc(), sortField);
-          comparators.add(cmp);
-          finishedDocValues.add(perField.fieldInfo.name);
+        perField.docValuesWriter.finish(state.segmentInfo.maxDoc());
+        Sorter.DocComparator cmp = perField.docValuesWriter.getDocComparator(state.segmentInfo.maxDoc(), sortField);
+        comparators.add(cmp);
+        finishedDocValues.add(perField.fieldInfo.name);
       } else {
         // safe to ignore, sort field with no values or already seen before
       }
@@ -130,7 +130,7 @@ final class DefaultIndexingChain extends DocConsumer {
     if (docState.infoStream.isEnabled("IW")) {
       docState.infoStream.message("IW", ((System.nanoTime()-t0)/1000000) + " msec to write norms");
     }
-    
+
     t0 = System.nanoTime();
     writeDocValues(state, sortMap);
     if (docState.infoStream.isEnabled("IW")) {
@@ -142,7 +142,7 @@ final class DefaultIndexingChain extends DocConsumer {
     if (docState.infoStream.isEnabled("IW")) {
       docState.infoStream.message("IW", ((System.nanoTime()-t0)/1000000) + " msec to write points");
     }
-    
+
     // it's possible all docs hit non-aborting exceptions...
     t0 = System.nanoTime();
     storedFieldsConsumer.finish(maxDoc);
@@ -295,7 +295,7 @@ final class DefaultIndexingChain extends DocConsumer {
           PerField perField = getPerField(fi.name);
           assert perField != null;
 
-          // we must check the final value of omitNorms for the fieldinfo: it could have 
+          // we must check the final value of omitNorms for the fieldinfo: it could have
           // changed for this field since the first time we added it.
           if (fi.omitsNorms() == false && fi.getIndexOptions() != IndexOptions.NONE) {
             assert perField.norms != null: "field=" + fi.name;
@@ -397,6 +397,7 @@ final class DefaultIndexingChain extends DocConsumer {
       if (docWriter.hasHitAbortingException() == false) {
         // Finish each indexed field name seen in the document:
         for (int i=0;i<fieldCount;i++) {
+          fields[i].termsHashPerField.flush();
           fields[i].finish();
         }
         finishStoredFields();
@@ -472,26 +473,26 @@ final class DefaultIndexingChain extends DocConsumer {
       }
       indexPoint(fp, field);
     }
-    
+
     return fieldCount;
   }
 
   private static void verifyUnIndexedFieldType(String name, IndexableFieldType ft) {
     if (ft.storeTermVectors()) {
       throw new IllegalArgumentException("cannot store term vectors "
-                                         + "for a field that is not indexed (field=\"" + name + "\")");
+          + "for a field that is not indexed (field=\"" + name + "\")");
     }
     if (ft.storeTermVectorPositions()) {
       throw new IllegalArgumentException("cannot store term vector positions "
-                                         + "for a field that is not indexed (field=\"" + name + "\")");
+          + "for a field that is not indexed (field=\"" + name + "\")");
     }
     if (ft.storeTermVectorOffsets()) {
       throw new IllegalArgumentException("cannot store term vector offsets "
-                                         + "for a field that is not indexed (field=\"" + name + "\")");
+          + "for a field that is not indexed (field=\"" + name + "\")");
     }
     if (ft.storeTermVectorPayloads()) {
       throw new IllegalArgumentException("cannot store term vector payloads "
-                                         + "for a field that is not indexed (field=\"" + name + "\")");
+          + "for a field that is not indexed (field=\"" + name + "\")");
     }
   }
 
@@ -522,9 +523,9 @@ final class DefaultIndexingChain extends DocConsumer {
         switch (dvType) {
           case NUMERIC:
             if (sortField.getType().equals(SortField.Type.INT) == false &&
-                  sortField.getType().equals(SortField.Type.LONG) == false &&
-                  sortField.getType().equals(SortField.Type.FLOAT) == false &&
-                  sortField.getType().equals(SortField.Type.DOUBLE) == false) {
+                sortField.getType().equals(SortField.Type.LONG) == false &&
+                sortField.getType().equals(SortField.Type.FLOAT) == false &&
+                sortField.getType().equals(SortField.Type.DOUBLE) == false) {
               throw new IllegalArgumentException("invalid doc value type:" + dvType + " for sortField:" + sortField);
             }
             break;
@@ -601,7 +602,7 @@ final class DefaultIndexingChain extends DocConsumer {
         }
         ((SortedDocValuesWriter) fp.docValuesWriter).addValue(docID, field.binaryValue());
         break;
-        
+
       case SORTED_NUMERIC:
         if (fp.docValuesWriter == null) {
           fp.docValuesWriter = new SortedNumericDocValuesWriter(fp.fieldInfo, bytesUsed);
@@ -653,7 +654,7 @@ final class DefaultIndexingChain extends DocConsumer {
       // IndexOptions to decide what arrays it must create).  Then, we also must set it in
       // PerField.invert to allow for later downgrading of the index options:
       fi.setIndexOptions(fieldType.indexOptions());
-      
+
       Map<String, String> attributes = fieldType.getAttributes();
       if (attributes != null) {
         attributes.forEach((k, v) -> fi.putAttribute(k, v));
@@ -712,7 +713,7 @@ final class DefaultIndexingChain extends DocConsumer {
 
     // Lazy init'd:
     NormValuesWriter norms;
-    
+
     // reused
     TokenStream tokenStream;
 
@@ -777,7 +778,7 @@ final class DefaultIndexingChain extends DocConsumer {
       }
 
       final boolean analyzed = fieldType.tokenized() && docState.analyzer != null;
-        
+
       /*
        * To assist people in tracking down problems in analysis components, we wish to write the field name to the infostream
        * when we fail. We expect some caller to eventually deal with the real exception, so we don't want any 'catch' clauses,
@@ -816,12 +817,12 @@ final class DefaultIndexingChain extends DocConsumer {
           if (posIncr == 0) {
             invertState.numOverlap++;
           }
-              
+
           int startOffset = invertState.offset + invertState.offsetAttribute.startOffset();
           int endOffset = invertState.offset + invertState.offsetAttribute.endOffset();
           if (startOffset < invertState.lastStartOffset || endOffset < startOffset) {
             throw new IllegalArgumentException("startOffset must be non-negative, and endOffset must be >= startOffset, and offsets must not go backwards "
-                                               + "startOffset=" + startOffset + ",endOffset=" + endOffset + ",lastStartOffset=" + invertState.lastStartOffset + " for field '" + field.name() + "'");
+                + "startOffset=" + startOffset + ",endOffset=" + endOffset + ",lastStartOffset=" + invertState.lastStartOffset + " for field '" + field.name() + "'");
           }
           invertState.lastStartOffset = startOffset;
 
@@ -830,7 +831,7 @@ final class DefaultIndexingChain extends DocConsumer {
           } catch (ArithmeticException ae) {
             throw new IllegalArgumentException("too many tokens for field \"" + field.name() + "\"");
           }
-          
+
           //System.out.println("  term=" + invertState.termAttribute);
 
           // If we hit an exception in here, we abort
@@ -860,7 +861,7 @@ final class DefaultIndexingChain extends DocConsumer {
         // trigger streams to perform end-of-stream operations
         stream.end();
 
-        // TODO: maybe add some safety? then again, it's already checked 
+        // TODO: maybe add some safety? then again, it's already checked
         // when we come back around to the field...
         invertState.position += invertState.posIncrAttribute.getPositionIncrement();
         invertState.offset += invertState.offsetAttribute.endOffset();
