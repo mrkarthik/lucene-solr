@@ -1665,8 +1665,8 @@ public class PositionDeque implements Iterable<Spans> {
                   } while ((endNodeLink = endNodeLink.prev) != anchor);
                   linkFromCaller.revisitEndNode = revisitFromEndNode;
                 }
-                default:
-                  break;
+              default:
+                break;
             }
           }
           if (leastSloppyPathToPhraseEnd == null || maxSlopRemainingCandidate > maxSlopRemainingToPhraseEnd) {
@@ -2694,12 +2694,15 @@ public class PositionDeque implements Iterable<Spans> {
     }
 
     public RevisitNode add(SLLNode linkNode, SLLNode updateFromOnRevisit, final int passId) {
-      RevisitNode ret = linkNode.getRevisitNode(updateFromOnRevisit, this, this.next, passId);
-      if (this.next != null) {
-        this.next.prev = ret;
+      if (linkNode != null) {
+        RevisitNode ret = linkNode.getRevisitNode(updateFromOnRevisit, this, this.next, passId);
+        if (this.next != null) {
+          this.next.prev = ret;
+        }
+        this.next = ret;
+        return ret;
       }
-      this.next = ret;
-      return ret;
+      return null;
     }
 
     public void remove() {
