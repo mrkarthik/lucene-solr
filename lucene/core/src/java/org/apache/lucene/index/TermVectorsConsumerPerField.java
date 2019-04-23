@@ -211,28 +211,13 @@ final class TermVectorsConsumerPerField extends TermsHashPerField {
       final int pos = fieldState.position - postings.lastPositions[termID];
       if (payload != null && payload.length > 0) {
         writeVInt(0, (pos<<1)|1);
-        final boolean allocateSpace = fieldState.allocatePositionLength;
-        int finalPayloadLength = allocateSpace ? payload.length + Integer.BYTES : payload.length;
-        writeVInt(0, finalPayloadLength);
+        writeVInt(0, payload.length);
         writeBytes(0, payload.bytes, payload.offset, payload.length);
-        if (allocateSpace) {
-          allocateMaxPositionLengthPlaceholder(0);
-        }
         hasPayloads = true;
       } else {
         writeVInt(0, pos<<1);
       }
       postings.lastPositions[termID] = fieldState.position;
-    }
-  }
-
-  @Override
-  protected boolean indexLookahead(PayloadAttribute payloadAtt) {
-    if (!doVectorPayloads) {
-      indexLookahead = IndexLookahead.FALSE;
-      return false;
-    } else {
-      return super.indexLookahead(payloadAtt);
     }
   }
 
