@@ -22,12 +22,12 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.analysis.MockTokenizer;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
@@ -46,11 +46,11 @@ import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.RandomIndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
-import static org.apache.lucene.search.spans.TestSpanCollection.ENCODE_LOOKAHEAD;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+
+import static org.apache.lucene.search.spans.TestSpanCollection.ENCODE_LOOKAHEAD;
 
 public class TestTermSpans extends LuceneTestCase {
 
@@ -62,6 +62,7 @@ public class TestTermSpans extends LuceneTestCase {
   public static final String FIELD2 = "other";
 
   public static final FieldType OFFSETS = new FieldType(TextField.TYPE_STORED);
+
   static {
     OFFSETS.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
   }

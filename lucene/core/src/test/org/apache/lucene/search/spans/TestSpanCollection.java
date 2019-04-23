@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
 
@@ -37,11 +38,13 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.FlattenGraphFilter;
 import org.apache.lucene.analysis.core.PositionLengthOrderTokenFilter;
 import org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilter;
+
 import static org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilter.CATENATE_WORDS;
 import static org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilter.GENERATE_NUMBER_PARTS;
 import static org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilter.GENERATE_WORD_PARTS;
 import static org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilter.PRESERVE_ORIGINAL;
 import static org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilter.STEM_ENGLISH_POSSESSIVE;
+
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 import org.apache.lucene.document.Document;
@@ -64,7 +67,9 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.QueryBuilder;
+
 import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 public class TestSpanCollection extends LuceneTestCase {
@@ -76,6 +81,7 @@ public class TestSpanCollection extends LuceneTestCase {
   public static final String FIELD = "field";
 
   public static FieldType OFFSETS = new FieldType(TextField.TYPE_STORED);
+
   static {
     OFFSETS.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
   }
@@ -185,37 +191,37 @@ public class TestSpanCollection extends LuceneTestCase {
 
   }
 
-  private static final int[][] problem2 = new int[][] {
-    {157, 159, 162, 165, 167, 170, 174, Integer.MAX_VALUE},
-    {189, 236, 290, Integer.MAX_VALUE},
-    {243, 246, 276, 325, Integer.MAX_VALUE},
-    {349, Integer.MAX_VALUE}
+  private static final int[][] problem2 = new int[][]{
+      {157, 159, 162, 165, 167, 170, 174, Integer.MAX_VALUE},
+      {189, 236, 290, Integer.MAX_VALUE},
+      {243, 246, 276, 325, Integer.MAX_VALUE},
+      {349, Integer.MAX_VALUE}
   };
   private static final String problemCase2;
-  private static final int[][] problem3 = new int[][] {
-    {71,76,120,124,127,148,171,183,195,199,211,247,306,333,343,346,351,354,358,367,370,375,382,405,414, Integer.MAX_VALUE},
-    {151,160,174,229,296,311,349,467,485, Integer.MAX_VALUE},
-    {164,173,197,228,236,323,348,353,377,404,412,449,472,480,516, Integer.MAX_VALUE},
-    {182,226,253,400,452,519, Integer.MAX_VALUE}
+  private static final int[][] problem3 = new int[][]{
+      {71, 76, 120, 124, 127, 148, 171, 183, 195, 199, 211, 247, 306, 333, 343, 346, 351, 354, 358, 367, 370, 375, 382, 405, 414, Integer.MAX_VALUE},
+      {151, 160, 174, 229, 296, 311, 349, 467, 485, Integer.MAX_VALUE},
+      {164, 173, 197, 228, 236, 323, 348, 353, 377, 404, 412, 449, 472, 480, 516, Integer.MAX_VALUE},
+      {182, 226, 253, 400, 452, 519, Integer.MAX_VALUE}
   };
   private static final int[][] problem3Solution = new int[][]{
-    {120, 183, 59},
-    {124, 183, 55},
-    {124, 227, 99},
-    {127, 183, 52},
-    {127, 227, 96},
-    {148, 183, 31},
-    {148, 227, 75},
-    {171, 227, 52},
-    {171, 254, 79},
-    {183, 254, 67},
-    {195, 254, 55},
-    {199, 254, 51},
-    {211, 254, 39},
-    {306, 401, 91},
-    {333, 401, 64},
-    {343, 401, 54},
-    {346, 401, 51}
+      {120, 183, 59},
+      {124, 183, 55},
+      {124, 227, 99},
+      {127, 183, 52},
+      {127, 227, 96},
+      {148, 183, 31},
+      {148, 227, 75},
+      {171, 227, 52},
+      {171, 254, 79},
+      {183, 254, 67},
+      {195, 254, 55},
+      {199, 254, 51},
+      {211, 254, 39},
+      {306, 401, 91},
+      {333, 401, 64},
+      {343, 401, 54},
+      {346, 401, 51}
   };
   private static final String problemCase3;
 
@@ -267,12 +273,12 @@ public class TestSpanCollection extends LuceneTestCase {
     }
     problemCase3 = sb.toString();
   }
-  
-  private static final int[] buildProblem4 = new int[] {-22, 87, 99, 103, 111, 117, 121, 124, 138, Integer.MAX_VALUE};
+
+  private static final int[] buildProblem4 = new int[]{-22, 87, 99, 103, 111, 117, 121, 124, 138, Integer.MAX_VALUE};
   private static final String problemCase4;
-  private static final int[] buildProblem = new int[] {182, 240, 246, 253, 281, 284, 287, 314, 318, Integer.MAX_VALUE};
+  private static final int[] buildProblem = new int[]{182, 240, 246, 253, 281, 284, 287, 314, 318, Integer.MAX_VALUE};
   private static final String problemCase;
-  
+
   static {
     int j = 0;
     StringBuilder sb = new StringBuilder(330 * 2);
@@ -306,7 +312,7 @@ public class TestSpanCollection extends LuceneTestCase {
   private static final String combinatorialCase;
   private static final int combinatorialTermCount = 8;
   private static final int combinatorialTermRepeat = 8;
-  
+
   static {
     int edgeCount = combinatorialTermCount * combinatorialTermRepeat;
     int edgeTermMaxSize = (int) Math.log10(edgeCount) + 3; // 1 for adjust, 1 for "e", 1 for space delim
@@ -320,7 +326,7 @@ public class TestSpanCollection extends LuceneTestCase {
     combinatorialCase = sb.substring(1);
     System.err.println(combinatorialCase);
   }
-  
+
   protected static final String[] docFields = {
       "w1 w2 w3 w4 w5", // 0
       "w1 w3 w2 w3 zz", // 1
@@ -348,9 +354,8 @@ public class TestSpanCollection extends LuceneTestCase {
       problemCase4 // 23
   };
 
-  
-  
-  @Test 
+
+  @Test
   public void testSimple() throws IOException {
     if (NARROW) return;
     SpanTermQuery q1 = new SpanTermQuery(new Term(FIELD, "w1"));
@@ -367,7 +372,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, new Term(FIELD, "w1"), new Term(FIELD, "w2"), new Term(FIELD, "w3"));
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testRejectedStartPosition() throws IOException {
     if (NARROW) return;
     SpanTermQuery q1 = new SpanTermQuery(new Term(FIELD, "q"));
@@ -392,7 +398,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, new Term(FIELD, "q"), new Term(FIELD, "r"), new Term(FIELD, "s"));
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testProblem3() throws IOException {
     if (NARROW) return;
     SpanTermQuery q1 = new SpanTermQuery(new Term(FIELD, "ay"));
@@ -414,14 +421,15 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
     assertEquals(Spans.NO_MORE_DOCS, spans.nextDoc());
   }
-  @Test 
+
+  @Test
   public void testOrLookahead() throws IOException {
     if (NARROW) return;
     SpanTermQuery q1 = new SpanTermQuery(new Term(FIELD, "ay"));
     SpanTermQuery q2 = new SpanTermQuery(new Term(FIELD, "by"));
     SpanTermQuery q3 = new SpanTermQuery(new Term(FIELD, "cy"));
     SpanTermQuery q4 = new SpanTermQuery(new Term(FIELD, "dy"));
-    SpanOrQuery q = new SpanOrQuery(new SpanQuery[] {q1, q2, q3, q4});
+    SpanOrQuery q = new SpanOrQuery(new SpanQuery[]{q1, q2, q3, q4});
     Spans spans = q.createWeight(searcher, true, 1f).getSpans(searcher.getIndexReader().leaves().get(0), SpanWeight.Postings.POSITIONS);
     ArrayList<Integer> allStartPositions = new ArrayList<>();
     for (int[] startPositions : problem3) {
@@ -437,15 +445,16 @@ public class TestSpanCollection extends LuceneTestCase {
     for (int i = 1; i < allStart.length; i++) {
       int expectedLookaheadStart = allStart[i];
       assertEquals(expectedStart, start = spans.nextStartPosition());
-      assertEquals(expectedLookaheadStart, ((IndexLookahead)spans).lookaheadNextStartPositionFloor());
+      assertEquals(expectedLookaheadStart, ((IndexLookahead) spans).lookaheadNextStartPositionFloor());
       expectedStart = expectedLookaheadStart;
     }
     assertEquals(expectedStart, start = spans.nextStartPosition());
-    assertEquals(Spans.NO_MORE_POSITIONS, ((IndexLookahead)spans).lookaheadNextStartPositionFloor());
+    assertEquals(Spans.NO_MORE_POSITIONS, ((IndexLookahead) spans).lookaheadNextStartPositionFloor());
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
     assertEquals(Spans.NO_MORE_DOCS, spans.nextDoc());
   }
-  @Test 
+
+  @Test
   public void testProblem2() throws IOException {
     if (NARROW) return;
     SpanTermQuery q1 = new SpanTermQuery(new Term(FIELD, "ax"));
@@ -458,7 +467,8 @@ public class TestSpanCollection extends LuceneTestCase {
     Spans spans = q.createWeight(searcher, false, 1f).getSpans(searcher.getIndexReader().leaves().get(0), SpanWeight.Postings.POSITIONS);
     assertEquals(Spans.NO_MORE_DOCS, spans.advance(20));
   }
-  @Test 
+
+  @Test
   public void testKings() throws IOException {
     if (NARROW) return; // "the the history the", // 19
     SpanTermQuery q1 = new SpanTermQuery(new Term(FIELD, "the"));
@@ -473,7 +483,8 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(0, spans.width());
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testProblemCase() throws IOException {
     if (NARROW) return; //"x y x y x y x y x y y y y y y y y y y y" // 17
     SpanTermQuery q1 = new SpanTermQuery(new Term(FIELD, "j"));
@@ -505,7 +516,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, new Term(FIELD, "j"));
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testProblemCase4() throws IOException {
     if (NARROW) return;
     SpanTermQuery q1 = new SpanTermQuery(new Term(FIELD, "j"));
@@ -573,7 +585,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, j, 246, 253, 281, 284, 287, 314, 318);
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testProblemCasePerPositionFullDistilled() throws IOException {
     if (NARROW) return; //"x y x y x y x y x y y y y y y y y y y y" // 17
     Term j = new Term(FIELD, "j");
@@ -606,7 +619,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, j, 246, 253, 281, 284, 287, 314, 318);
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testProblemCasePerPositionFullDistilledPerStartPosition() throws IOException {
     if (NARROW) return; //"x y x y x y x y x y y y y y y y y y y y" // 17
     Term j = new Term(FIELD, "j");
@@ -639,7 +653,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, j, 246, 253, 281, 284, 287, 314, 318);
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testProblemCasePerPositionFullDistilledPerPosition() throws IOException {
     if (NARROW) return;
     Term j = new Term(FIELD, "j");
@@ -672,7 +687,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, j, 246);
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testProblemCasePerPosition() throws IOException {
     if (NARROW) return;
     Term j = new Term(FIELD, "j");
@@ -705,7 +721,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, j, 246);
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testOverlap() throws IOException {
     if (NARROW) return; //"x y x y x y x y x y y y y y y y y y y y" // 17
     SpanTermQuery qa = new SpanTermQuery(new Term(FIELD, "x"));
@@ -754,7 +771,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
 
-  @Test 
+  @Test
   public void testPersistentSlopTracking() throws IOException {
     if (NARROW) return;
     SpanTermQuery qa = new SpanTermQuery(new Term(FIELD, "a"));
@@ -790,7 +807,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
 
-  @Test 
+  @Test
   public void testSkipAhead() throws IOException {
     if (NARROW) return; // "sa sb sx sc sd sx se sf sg sx sh si sj", // 15
     SpanTermQuery qx = new SpanTermQuery(new Term(FIELD, "sx"));
@@ -807,23 +824,23 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(15, spans.advance(15));
     assertEquals(0, spans.nextStartPosition());
     assertEquals(8, spans.endPosition());
-    checkCollectedTerms(spans, collector, new Term(FIELD, "sa"), new Term(FIELD, "sb"), new Term(FIELD, "sx"), new Term(FIELD, "sc"), 
+    checkCollectedTerms(spans, collector, new Term(FIELD, "sa"), new Term(FIELD, "sb"), new Term(FIELD, "sx"), new Term(FIELD, "sc"),
         new Term(FIELD, "sd"), new Term(FIELD, "se"), new Term(FIELD, "sf"));
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  
-  @Test 
+
+  @Test
   public void testBlah2() throws IOException {
     if (NARROW) return; // "a b b a b a b a b a b a b a b a b a b a b a b a b a b a b a b a", // 14
     int[][] expected = new int[][]{
-      {3, 18, 7},
-      {5, 20, 7},
-      {7, 22, 7},
-      {9, 24, 7},
-      {11, 26, 7},
-      {13, 28, 7},
-      {15, 30, 7},
-      {17, 32, 7},
+        {3, 18, 7},
+        {5, 20, 7},
+        {7, 22, 7},
+        {9, 24, 7},
+        {11, 26, 7},
+        {13, 28, 7},
+        {15, 30, 7},
+        {17, 32, 7},
     };
     Term a = new Term(FIELD, "a");
     SpanTermQuery q1 = new SpanTermQuery(a);
@@ -848,7 +865,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
 
-  @Test 
+  @Test
   public void testShortcircuitFalse() throws IOException {
     if (NARROW) return;
     Term a = new Term(FIELD, "a");
@@ -878,7 +895,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
 
-  @Test 
+  @Test
   public void testFallbackTrue() throws IOException {
     if (NARROW) return;
     Term a = new Term(FIELD, "a");
@@ -899,7 +916,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
 
-  @Test 
+  @Test
   public void testAutoNoOverlap() throws IOException {
     // TODO this doesn't work properly yet.
     if (true || NARROW) return;
@@ -915,7 +932,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(13, spans.advance(13));
     int i;
     while ((i = spans.nextStartPosition()) != Spans.NO_MORE_POSITIONS) {
-      System.err.println(i+" => "+spans.endPosition());
+      System.err.println(i + " => " + spans.endPosition());
     }
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
@@ -939,7 +956,7 @@ public class TestSpanCollection extends LuceneTestCase {
         assertTrue("Missing term " + expectedTerm + " at position " + i, expectedTerm == collector.terms.get(i));
       }
     }
-    assertEquals("Unexpected terms found; expected "+Arrays.toString(expectedTermPositions)+", found "+collector.terms.keySet(), expectedTermPositions.length, collector.terms.size());
+    assertEquals("Unexpected terms found; expected " + Arrays.toString(expectedTermPositions) + ", found " + collector.terms.keySet(), expectedTermPositions.length, collector.terms.size());
   }
 
   @Test
@@ -950,7 +967,7 @@ public class TestSpanCollection extends LuceneTestCase {
       termQueries[i] = new SpanTermQuery(new Term(FIELD, "e".concat(Integer.toString(i + 1))));
     }
     int slop = combinatorialTermCount * (combinatorialTermRepeat - 1);
-    System.err.println("combinatorial slop = "+slop);
+    System.err.println("combinatorial slop = " + slop);
     SpanNearQuery nearQuery = new SpanNearQuery(termQueries, slop, true, SpanNearQuery.ComboMode.FULL);
     SpanWeight w = nearQuery.createWeight(searcher, true, 1f);
     LeafReaderContext ctx = searcher.getIndexReader().leaves().get(0);
@@ -1017,7 +1034,7 @@ public class TestSpanCollection extends LuceneTestCase {
       termQueries[i] = new SpanTermQuery(new Term(FIELD, "e".concat(Integer.toString(i + 1))));
     }
     int slop = combinatorialTermCount * (combinatorialTermRepeat - 1);
-    System.err.println("combinatorial slop = "+slop);
+    System.err.println("combinatorial slop = " + slop);
     SpanNearQuery nearQuery = new SpanNearQuery(termQueries, slop, true);
     SpanWeight w = nearQuery.createWeight(searcher, true, 1f);
     LeafReaderContext ctx = searcher.getIndexReader().leaves().get(0);
@@ -1034,6 +1051,7 @@ public class TestSpanCollection extends LuceneTestCase {
     }
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
+
   @Test
   public void testCombinatorialCasePerPositionPerStartPosition() throws IOException {
     if (NARROW) return;
@@ -1042,7 +1060,7 @@ public class TestSpanCollection extends LuceneTestCase {
       termQueries[i] = new SpanTermQuery(new Term(FIELD, "e".concat(Integer.toString(i + 1))));
     }
     int slop = combinatorialTermCount * (combinatorialTermRepeat - 1);
-    System.err.println("combinatorial slop = "+slop);
+    System.err.println("combinatorial slop = " + slop);
     SpanNearQuery nearQuery = new SpanNearQuery(termQueries, slop, true, SpanNearQuery.ComboMode.PER_POSITION_PER_START_POSITION);
     SpanWeight w = nearQuery.createWeight(searcher, true, 1f);
     LeafReaderContext ctx = searcher.getIndexReader().leaves().get(0);
@@ -1055,7 +1073,7 @@ public class TestSpanCollection extends LuceneTestCase {
       Term t = new Term(FIELD, "e".concat(Integer.toString(i)));
       compareAll[--i] = t;
     } while (i > 0);
-    Term[] compareLastTerm = new Term[] {compareAll[combinatorialTermCount - 1]};
+    Term[] compareLastTerm = new Term[]{compareAll[combinatorialTermCount - 1]};
     int widthStart = (combinatorialTermRepeat - 1) * (combinatorialTermCount - 1);
     int endStart = combinatorialTermRepeat * (combinatorialTermCount - 1) + 1;
     int endCeiling = combinatorialTermRepeat * combinatorialTermCount + 1;
@@ -1074,6 +1092,7 @@ public class TestSpanCollection extends LuceneTestCase {
     }
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
+
   @Test
   public void testCombinatorialCasePerPosition() throws IOException {
     if (NARROW) return;
@@ -1082,7 +1101,7 @@ public class TestSpanCollection extends LuceneTestCase {
       termQueries[i] = new SpanTermQuery(new Term(FIELD, "e".concat(Integer.toString(i + 1))));
     }
     int slop = combinatorialTermCount * (combinatorialTermRepeat - 1);
-    System.err.println("combinatorial slop = "+slop);
+    System.err.println("combinatorial slop = " + slop);
     SpanNearQuery nearQuery = new SpanNearQuery(termQueries, slop, true, SpanNearQuery.ComboMode.PER_POSITION);
     SpanWeight w = nearQuery.createWeight(searcher, true, 1f);
     LeafReaderContext ctx = searcher.getIndexReader().leaves().get(0);
@@ -1095,9 +1114,9 @@ public class TestSpanCollection extends LuceneTestCase {
       Term t = new Term(FIELD, "e".concat(Integer.toString(i)));
       compareAll[--i] = t;
     } while (i > 0);
-    int[] initialCompare = new int[] {0, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56};
-    int[] initialEndCompare = new int[] {57};
-    Term[] compareLastTerm = new Term[] {compareAll[combinatorialTermCount - 1]};
+    int[] initialCompare = new int[]{0, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56};
+    int[] initialEndCompare = new int[]{57};
+    Term[] compareLastTerm = new Term[]{compareAll[combinatorialTermCount - 1]};
     int widthStart = (combinatorialTermRepeat - 1) * (combinatorialTermCount - 1);
     int endStart = combinatorialTermRepeat * (combinatorialTermCount - 1) + 1;
     int endCeiling = combinatorialTermRepeat * combinatorialTermCount + 1;
@@ -1119,7 +1138,7 @@ public class TestSpanCollection extends LuceneTestCase {
         }
         expectWidth++;
       }
-      compare = new int[] {expectStart + 1};
+      compare = new int[]{expectStart + 1};
       widthStart--;
     }
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
@@ -1133,7 +1152,7 @@ public class TestSpanCollection extends LuceneTestCase {
       termQueries[i] = new SpanTermQuery(new Term(FIELD, "e".concat(Integer.toString(i + 1))));
     }
     int slop = combinatorialTermCount * (combinatorialTermRepeat - 1);
-    System.err.println("combinatorial slop = "+slop);
+    System.err.println("combinatorial slop = " + slop);
     SpanNearQuery nearQuery = new SpanNearQuery(termQueries, slop, true, SpanNearQuery.ComboMode.FULL_DISTILLED);
     SpanWeight w = nearQuery.createWeight(searcher, true, 1f);
     LeafReaderContext ctx = searcher.getIndexReader().leaves().get(0);
@@ -1146,7 +1165,7 @@ public class TestSpanCollection extends LuceneTestCase {
       Term t = new Term(FIELD, "e".concat(Integer.toString(i)));
       compareAll[--i] = t;
     } while (i > 0);
-    int[] compare = new int[] {0, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56};
+    int[] compare = new int[]{0, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56};
     final int lastCompareIndex = compare.length - 1;
     int widthStart = (combinatorialTermRepeat - 1) * (combinatorialTermCount - 1);
     int endStart = combinatorialTermRepeat * (combinatorialTermCount - 1) + 1;
@@ -1168,7 +1187,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
 
-  @Test 
+  @Test
   public void testSomethingHitFull() throws IOException {
     if (NARROW) return;
     SpanTermQuery qa = new SpanTermQuery(new Term(FIELD, "a"));
@@ -1189,8 +1208,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, new Term(FIELD, "a"), new Term(FIELD, "b"), new Term(FIELD, "c"));
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  
-  @Test 
+
+  @Test
   public void testSomethingHitFullMulti() throws IOException {
     if (NARROW) return; // "a a a b b b c c c d x x d"
     SpanTermQuery qa = new SpanTermQuery(new Term(FIELD, "a"));
@@ -1220,7 +1239,8 @@ public class TestSpanCollection extends LuceneTestCase {
     }
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  @Test 
+
+  @Test
   public void testSomethingHitFullDistilled() throws IOException {
     if (NARROW) return; // "a a a b b b c c c d x x d"
     SpanTermQuery qa = new SpanTermQuery(new Term(FIELD, "a"));
@@ -1248,8 +1268,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, null, 2, 3, 4, 5, 6, 7, 8, 9);
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  
-  @Test 
+
+  @Test
   public void testSomethingHitPerEndPosition() throws IOException {
     if (NARROW) return;
     SpanTermQuery qa = new SpanTermQuery(new Term(FIELD, "a"));
@@ -1264,8 +1284,8 @@ public class TestSpanCollection extends LuceneTestCase {
     checkCollectedTerms(spans, collector, new Term(FIELD, "a"), new Term(FIELD, "b"), new Term(FIELD, "c"));
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
   }
-  
-  @Test 
+
+  @Test
   public void testSomethingMiss() throws IOException {
     if (NARROW) return;
     SpanTermQuery qa = new SpanTermQuery(new Term(FIELD, "a"));
@@ -1275,7 +1295,7 @@ public class TestSpanCollection extends LuceneTestCase {
     Spans spans = q.createWeight(searcher, false, 1f).getSpans(searcher.getIndexReader().leaves().get(0), SpanWeight.Postings.POSITIONS);
     assertEquals(Spans.NO_MORE_DOCS, spans.advance(12));
   }
-  
+
   @Test
   public void testSimpleOrQuery() throws IOException {
     if (NARROW) return;
@@ -1319,7 +1339,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(1, spans.nextStartPosition());
     assertEquals(2, spans.endPosition());
     checkCollectedTerms(spans, collector, new Term(FIELD, "t2"));
-    
+
     assertEquals(2, spans.nextStartPosition());
     assertEquals(3, spans.endPosition());
     checkCollectedTerms(spans, collector, new Term(FIELD, "t1"));
@@ -1329,7 +1349,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(3, spans.nextStartPosition());
     assertEquals(4, spans.endPosition());
     checkCollectedTerms(spans, collector, new Term(FIELD, "t2"));
-    
+
     assertEquals(4, spans.nextStartPosition());
     assertEquals(5, spans.endPosition());
     checkCollectedTerms(spans, collector, new Term(FIELD, "t1"));
@@ -1339,7 +1359,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(5, spans.nextStartPosition());
     assertEquals(6, spans.endPosition());
     checkCollectedTerms(spans, collector, new Term(FIELD, "t2"));
-    
+
     assertEquals(6, spans.nextStartPosition());
     assertEquals(7, spans.endPosition());
     checkCollectedTerms(spans, collector, new Term(FIELD, "t1"));
@@ -1498,13 +1518,13 @@ public class TestSpanCollection extends LuceneTestCase {
     try {
       assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
     } catch (AssertionError er) {
-      System.err.println("QUERY: "+q7);
-      System.err.println("INPUT: "+docFields[3]);
-      System.err.println("ERROR: "+spans);
+      System.err.println("QUERY: " + q7);
+      System.err.println("INPUT: " + docFields[3]);
+      System.err.println("ERROR: " + spans);
       throw er;
     }
     System.err.println("OK 2");
-    
+
     SpanNearQuery q23 = new SpanNearQuery(new SpanQuery[]{q2, q3}, 0, true);
     SpanOrQuery q223 = new SpanOrQuery(q2, q23);
 
@@ -1535,7 +1555,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
     System.err.println("OK 5");
 
-    spans =q1q223.createWeight(searcher, false, 1f).getSpans(searcher.getIndexReader().leaves().get(0), SpanWeight.Postings.POSITIONS);
+    spans = q1q223.createWeight(searcher, false, 1f).getSpans(searcher.getIndexReader().leaves().get(0), SpanWeight.Postings.POSITIONS);
     assertEquals(0, spans.advance(0));
     spans.nextStartPosition();
     checkCollectedTerms(spans, collector, new Term(FIELD, "w1"), new Term(FIELD, "w2"));
@@ -1544,7 +1564,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(Spans.NO_MORE_POSITIONS, spans.nextStartPosition());
     System.err.println("OK 6");
 
-    spans =q1q223q4.createWeight(searcher, false, 1f).getSpans(searcher.getIndexReader().leaves().get(0), SpanWeight.Postings.POSITIONS);
+    spans = q1q223q4.createWeight(searcher, false, 1f).getSpans(searcher.getIndexReader().leaves().get(0), SpanWeight.Postings.POSITIONS);
     assertEquals(0, spans.advance(0));
     assertEquals(0, spans.nextStartPosition());
     assertEquals(4, spans.endPosition());
@@ -1588,7 +1608,7 @@ public class TestSpanCollection extends LuceneTestCase {
       try (DirectoryReader reader = DirectoryReader.open(w, true, true)) {
         IndexSearcher searcher = new IndexSearcher(reader);
         Query q = new QueryBuilder(searchAnalyzer).setUseSpansForGraphQueries(true).createPhraseQuery(field, input);
-        System.err.println("QUERY: "+q);
+        System.err.println("QUERY: " + q);
         TopDocs topDocs = searcher.search(q, 10);
         try {
           assertEquals(1, topDocs.totalHits);
@@ -1603,7 +1623,8 @@ public class TestSpanCollection extends LuceneTestCase {
    * here we test the case where the token "ill" is indexed with
    * varying position lengths, and can make certain non-matching queries
    * become matching, iff supportVariableTermSpansLength == true
-   * @throws Exception
+   *
+   * @throws Exception exception
    */
   public void testVariableTermSpanLength() throws Exception {
     if (NARROW) return;
@@ -1649,6 +1670,7 @@ public class TestSpanCollection extends LuceneTestCase {
   }
 
   private final boolean NARROW = false;
+
   @Test
   public void testNestedOrQuery() throws IOException {
     if (NARROW) return;
@@ -1736,7 +1758,7 @@ public class TestSpanCollection extends LuceneTestCase {
     Spans spans = snq.createWeight(searcher, false, 1f).getSpans(searcher.getIndexReader().leaves().get(0), SpanWeight.Postings.POSITIONS);
     assertEquals(8, spans.advance(8));
   }
-  
+
   @Test
   public void testNestedOrQuery2() throws IOException {
     if (NARROW) return;
@@ -1760,7 +1782,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(4, spans.advance(4));
     assertEquals(5, spans.nextDoc());
   }
-  
+
   @Test
   public void testNestedOrQueryLookAhead() throws IOException {
     if (NARROW) return;
@@ -1782,7 +1804,7 @@ public class TestSpanCollection extends LuceneTestCase {
     assertEquals(6, spans.advance(0));
     assertEquals(Spans.NO_MORE_DOCS, spans.nextDoc());
   }
-  
+
   @Test
   public void testBlah() throws IOException {
     if (NARROW) return;
@@ -1842,7 +1864,7 @@ public class TestSpanCollection extends LuceneTestCase {
 //    checkCollectedTerms(spans, collector, new Term(FIELD, "a"), new Term(FIELD, "d"), new Term(FIELD, "g"));
 //    assertEquals(Spans.NO_MORE_DOCS, spans.nextDoc());
   }
-  
+
   @Test
   public void testOrQuery() throws IOException {
     if (NARROW) return;
