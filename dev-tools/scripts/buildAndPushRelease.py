@@ -88,7 +88,7 @@ def getGitRev():
   print('  git clone is clean')
   return os.popen('git rev-parse HEAD').read().strip()
 
-def prepare(root, version, bvsVersion, gpgKeyID, gpgPassword):
+def prepare(root, version, gpgKeyID, gpgPassword):
   print()
   print('Prepare release...')
   if os.path.exists(LOG):
@@ -113,7 +113,6 @@ def prepare(root, version, bvsVersion, gpgKeyID, gpgPassword):
   print('  lucene prepare-release')
   os.chdir('lucene')
   cmd = 'ant -Dversion=%s' % version
-  cmd += ' -Ddev.version.suffix=%s' % bvsVersion
   if gpgKeyID is not None:
     cmd += ' -Dgpg.key=%s prepare-release' % gpgKeyID
   else:
@@ -127,7 +126,6 @@ def prepare(root, version, bvsVersion, gpgKeyID, gpgPassword):
   print('  solr prepare-release')
   os.chdir('../solr')
   cmd = 'ant -Dversion=%s' % version
-  cmd += ' -Ddev.version.suffix=%s' % bvsVersion
   if gpgKeyID is not None:
     cmd += ' -Dgpg.key=%s prepare-release' % gpgKeyID
   else:
@@ -232,7 +230,8 @@ def pushLocal(version, root, rev, rcNum, localDir):
 
 def read_version(path):
   version_props_file = os.path.join(path, 'lucene', 'version.properties')
-  return re.search(r'version\.base=(.*)', open(version_props_file).read()).group(1)
+  version = re.search(r'version\.base=(.*)', open(version_props_file).read()).group(1)
+  return version + "-" + read_bvs_version(path)
 
 def read_bvs_version(path):
   version_props_file = os.path.join(path, 'lucene', 'version.properties')
@@ -281,8 +280,6 @@ def parse_config():
 
   config.version = read_version(config.root)
   print('Building version: %s' % config.version)
-  config.bvsversion = read_bvs_version(config.root)
-  print('Building BVS version: %s' % config.bvsversion)
 
   return config
 
@@ -353,7 +350,7 @@ def main():
     c.key_password = None
   
   if c.prepare:
-    rev = prepare(c.root, c.version, c.bvsversion, c.key_id, c.key_password)
+    rev = prepare(c.root, c.version, c.key_id, c.key_password)
   else:
     os.chdir(c.root)
     rev = open('rev.txt', encoding='UTF-8').read()
@@ -375,4 +372,3 @@ if __name__ == '__main__':
     main()
   except KeyboardInterrupt:
     print('Keyboard interrupt...exiting')
-
