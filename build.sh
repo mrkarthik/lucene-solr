@@ -49,7 +49,7 @@ function prepare () {
   fi
   local BASEDIR="${1}"
   local REL_BASE_DIR="/tmp/releases"
-  RELEASE_VERSION=$(grep "version.base=" ${BASEDIR}/lucene/version.properties | cut -d'=' -f2)
+  RELEASE_VERSION=$(grep "^version.base=" ${BASEDIR}/lucene/version.properties | cut -d'=' -f2)
   local RC_RELEASE_VERSION=${RELEASE_VERSION}-RC
   local RC_RELEASE_VERSION_LEN=$(echo ${RC_RELEASE_VERSION} | wc -c)
   local LAST_RC_NUM=0

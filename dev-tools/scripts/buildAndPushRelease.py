@@ -113,6 +113,7 @@ def prepare(root, version, gpgKeyID, gpgPassword):
   print('  lucene prepare-release')
   os.chdir('lucene')
   cmd = 'ant -Dversion=%s' % version
+  cmd += ' -Ddev.version.suffix=%s' % VERSION_SUFFIX
   if gpgKeyID is not None:
     cmd += ' -Dgpg.key=%s prepare-release' % gpgKeyID
   else:
@@ -232,6 +233,12 @@ def read_version(path):
   version_props_file = os.path.join(path, 'lucene', 'version.properties')
   return re.search(r'version\.base=(.*)', open(version_props_file).read()).group(1)
 
+def read_bvs_version(path):
+  version_props_file = os.path.join(path, 'lucene', 'version.properties')
+  versionSuffix = re.search(r'bvs\.version\.suffix=(.*)', open(version_props_file).read()).group(1)
+  versionBase = re.search(r'bvs\.version\.base=(.*)', open(version_props_file).read()).group(1)
+  return versionSuffix + "-" + versionBase
+
 def parse_config():
   epilogue = textwrap.dedent('''
     Example usage for a Release Manager:
@@ -273,6 +280,8 @@ def parse_config():
 
   config.version = read_version(config.root)
   print('Building version: %s' % config.version)
+  config.bvsversion = read_bvs_version(config.root)
+  print('Building BVS version: %s' % config.bvsversion)
 
   return config
 
