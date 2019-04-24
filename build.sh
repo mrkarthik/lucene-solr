@@ -6,18 +6,15 @@ REPOSITORY_URL="https://artprod.dev.bloomberg.com/artifactory/libs-release"
 REPOSITORY_ID="central"
 REPOSITORY_USERNAME="bvltuser"
 REPOSITORY_PASSWORD="AP4VyaWNaBCo4YyPqA1i8zLwfs6"
-VERSION_SUFFIX="bvs"
 RC_BUILD_MODE="build"
 RC_REBUILD_MODE="rebuild"
 RC_NOBUILD_MODE="nobuild"
-RELEASE_LOGFILE="/tmp/release.log"
-RELEASE_BUILD_LOGFILE="/tmp/build.log"
+LOGFILE="/tmp/build.log"
 
 BUILD=""
 RELEASE_VERSION=""
 RELEASE_FOLDER=""
 RELEASE_RECUT_NUMBER=0
-LOGFILE=""
 
 function log () {
   echo "$(date +'%m-%d-%Y %T') ${1}"
@@ -49,7 +46,10 @@ function prepare () {
   fi
   local BASEDIR="${1}"
   local REL_BASE_DIR="/tmp/releases"
-  RELEASE_VERSION=$(grep "^version.base=" ${BASEDIR}/lucene/version.properties | cut -d'=' -f2)
+  local SOLR_VERSION=$(grep "^version.base=" ${BASEDIR}/lucene/version.properties | cut -d'=' -f2)
+  local BVS_SUFFIX=$(grep "^bvs.version.suffix=" ${BASEDIR}/lucene/version.properties | cut -d'=' -f2)
+  local BVS_VERSION=$(grep "^bvs.version.base=" ${BASEDIR}/lucene/version.properties | cut -d'=' -f2)
+  RELEASE_VERSION="${SOLR_VERSION}-${BVS_SUFFIX}-${BVS_VERSION}"
   local RC_RELEASE_VERSION=${RELEASE_VERSION}-RC
   local RC_RELEASE_VERSION_LEN=$(echo ${RC_RELEASE_VERSION} | wc -c)
   local LAST_RC_NUM=0
@@ -80,52 +80,19 @@ function prepare () {
       return 1;
     fi
   fi
-  BVS_OPTIONS="-Ddev.version.suffix=${VERSION_SUFFIX}"
   MAVEN_OPTIONS="-Dm2.repository.id=${REPOSITORY_ID} -Dm2.repository.url=${REPOSITORY_URL} -Dm2.repository.username=${REPOSITORY_USERNAME} -Dm2.repository.password=${REPOSITORY_PASSWORD}"
 
   return 0;
 }
 
-function buildAndTestWitAnt () {
+function buildTestAndDeployLocal () {
   local BASEDIR="${1}"
   if [[ ${BUILD} == ${RC_NOBUILD_MODE} ]] ; then
     log "Skipping Build and Test...."
     return 0;
   fi
   # Prepare for Release
-  log "Build Lucene/Solr...."
-  local COMMAND_TO_EXECUTE="ant clean precommit"
-  executeCommand ${COMMAND_TO_EXECUTE}
-  local ERROR_CODE=${?}
-  if [[ ${ERROR_CODE} == 0 ]] ; then
-    log "Preparing Lucene for release..."
-    cd ${BASEDIR}/lucene
-    COMMAND_TO_EXECUTE="ant prepare-release-no-sign ${MAVEN_OPTIONS} ${BVS_OPTIONS}"
-    executeCommand ${COMMAND_TO_EXECUTE}
-    ERROR_CODE=${?}
-    if [[ ${ERROR_CODE} == 0 ]] ; then
-      log "Lucene ready for release"
-      log "Preparing Solr for release..."
-      cd ${BASEDIR}/solr
-      COMMAND_TO_EXECUTE="ant prepare-release-no-sign ${MAVEN_OPTIONS} ${BVS_OPTIONS}"
-      executeCommand ${COMMAND_TO_EXECUTE}
-      ERROR_CODE=${?}
-      if [[ ${ERROR_CODE} == 0 ]] ; then
-        log "Solr ready for release"
-      fi
-    fi
-  fi
-
-  return ${ERROR_CODE};
-}
-
-function buildAndTest () {
-  local BASEDIR="${1}"
-  if [[ ${BUILD} == ${RC_NOBUILD_MODE} ]] ; then
-    log "Skipping Build and Test...."
-    return 0;
-  fi
-  # Prepare for Release
+  rm rev.txt &> /dev/null
   log "Build and prepare Lucene/Solr...."
   local COMMAND_TO_EXECUTE="python3 -u dev-tools/scripts/buildAndPushRelease.py --push-local ${RELEASE_FOLDER} --rc-num ${RELEASE_RECUT_NUMBER} --root ${BASEDIR}"
   executeCommand ${COMMAND_TO_EXECUTE}
@@ -144,7 +111,7 @@ function pushToMaven () {
   # Stage POM for lucene deployment
   cd ${BASEDIR}/lucene
   log "Push lucene to Maven..."
-  local COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} ${BVS_OPTIONS} -Dmaven.dist.dir=${RELEASE_REV_FOLDER}/lucene/maven/"
+  local COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} -Dmaven.dist.dir=${RELEASE_REV_FOLDER}/lucene/maven/"
   executeCommand ${COMMAND_TO_EXECUTE}
   local ERROR_CODE=${?}
   if [[ ${ERROR_CODE} == 0 ]] ; then
@@ -152,7 +119,7 @@ function pushToMaven () {
     # Stage POM for SOLR deployment
     cd ${BASEDIR}/solr
     log "Push solr to Maven..."
-    COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} ${BVS_OPTIONS} -Dmaven.dist.dir=${RELEASE_REV_FOLDER}/solr/maven/"
+    COMMAND_TO_EXECUTE="ant clean stage-maven-artifacts ${MAVEN_OPTIONS} -Dmaven.dist.dir=${RELEASE_REV_FOLDER}/solr/maven/"
     executeCommand ${COMMAND_TO_EXECUTE}
     ERROR_CODE=${?}
     if [[ ${ERROR_CODE} == 0 ]] ; then
@@ -181,9 +148,7 @@ function logStatus () {
 function main() {
   # Clean up
   clear
-  rm rev.txt &> /dev/null
-  rm ${RELEASE_LOGFILE} &> /dev/null
-  rm ${RELEASE_BUILD_LOGFILE} &> /dev/null
+  rm ${LOGFILE} &> /dev/null
 
   # Arguments
   if [[ $# -gt 0 ]] ; then
@@ -195,14 +160,6 @@ function main() {
   if [[ "${1}" == "--help" ]] ; then
       log "Usage: ${0} [build (true or false) or rebuild]"
       exit 1
-  fi
-
-  if [[ "${1}" == "ANT" ]] ; then
-    local BUILD_TYPE="${1}"
-    LOGFILE=${RELEASE_LOGFILE}
-    shift
-  else
-    LOGFILE=${RELEASE_BUILD_LOGFILE}
   fi
 
   if [[ "${1}" == "false" ]] ; then
@@ -218,11 +175,7 @@ function main() {
   prepare ${BASEDIR}
   local ERROR_CODE=${?}
   if [[ ${ERROR_CODE} == 0 ]] ; then
-    if [[ "${BUILD_TYPE}" == "ANT" ]] ; then
-      buildAndTestWitAnt ${BASEDIR}
-    else
-      buildAndTest ${BASEDIR}
-    fi
+    buildTestAndDeployLocal ${BASEDIR}
     ERROR_CODE=${?}
     if [[ ${ERROR_CODE} == 0 ]] ; then
       pushToMaven ${BASEDIR}

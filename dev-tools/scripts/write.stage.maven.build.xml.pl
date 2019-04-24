@@ -145,10 +145,6 @@ sub output_deploy_stanza {
     print $output_build_xml qq!
       <m2-deploy pom.xml="${pom_file}" jar.file="${war_file}">
         $parent_pom_targets
-        <artifact-attachments>
-          <attach file="${pom_file}.asc" type="pom.asc"/>
-          <attach file="${war_file}.asc" type="war.asc"/>
-        </artifact-attachments>
         $credentials
       </m2-deploy>\n!;
   } elsif (-f $jar_file) {
@@ -158,10 +154,6 @@ sub output_deploy_stanza {
         <artifact-attachments>
           <attach file="${basepath}-sources.jar" classifier="sources"/>
           <attach file="${basepath}-javadoc.jar" classifier="javadoc"/>
-          <attach file="${pom_file}.asc" type="pom.asc"/>
-          <attach file="${jar_file}.asc" type="jar.asc"/>
-          <attach file="${basepath}-sources.jar.asc" classifier="sources" type="jar.asc"/>
-          <attach file="${basepath}-javadoc.jar.asc" classifier="javadoc" type="jar.asc"/>
         </artifact-attachments>
         $credentials
       </m2-deploy>\n!;
@@ -169,9 +161,6 @@ sub output_deploy_stanza {
     print $output_build_xml qq!
       <m2-deploy pom.xml="${pom_file}">
         $parent_pom_targets
-        <artifact-attachments>
-          <attach file="${pom_file}.asc" type="pom.asc"/>
-        </artifact-attachments>
         $credentials
       </m2-deploy>\n!;
   }
