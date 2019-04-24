@@ -59,7 +59,7 @@ def runAndSendGPGPassword(command, password):
       msg = '    FAILED: %s [see log %s]' % (command, LOG)
       print(msg)
       raise RuntimeError(msg)
-  except TimeoutExpired:
+  except subprocess.TimeoutExpired:
     msg = '    FAILED: %s [timed out after 2 minutes; see log %s]' % (command, LOG)
     print(msg)
     raise RuntimeError(msg)
@@ -88,7 +88,7 @@ def getGitRev():
   print('  git clone is clean')
   return os.popen('git rev-parse HEAD').read().strip()
 
-def prepare(root, version, gpgKeyID, gpgPassword):
+def prepare(root, version, bvsVersion, gpgKeyID, gpgPassword):
   print()
   print('Prepare release...')
   if os.path.exists(LOG):
@@ -113,7 +113,7 @@ def prepare(root, version, gpgKeyID, gpgPassword):
   print('  lucene prepare-release')
   os.chdir('lucene')
   cmd = 'ant -Dversion=%s' % version
-  cmd += ' -Ddev.version.suffix=%s' % VERSION_SUFFIX
+  cmd += ' -Ddev.version.suffix=%s' % bvsVersion
   if gpgKeyID is not None:
     cmd += ' -Dgpg.key=%s prepare-release' % gpgKeyID
   else:
@@ -127,6 +127,7 @@ def prepare(root, version, gpgKeyID, gpgPassword):
   print('  solr prepare-release')
   os.chdir('../solr')
   cmd = 'ant -Dversion=%s' % version
+  cmd += ' -Ddev.version.suffix=%s' % bvsVersion
   if gpgKeyID is not None:
     cmd += ' -Dgpg.key=%s prepare-release' % gpgKeyID
   else:
@@ -352,7 +353,7 @@ def main():
     c.key_password = None
   
   if c.prepare:
-    rev = prepare(c.root, c.version, c.key_id, c.key_password)
+    rev = prepare(c.root, c.version, c.bvsversion, c.key_id, c.key_password)
   else:
     os.chdir(c.root)
     rev = open('rev.txt', encoding='UTF-8').read()
