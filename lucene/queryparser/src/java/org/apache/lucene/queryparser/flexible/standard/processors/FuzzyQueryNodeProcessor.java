@@ -72,7 +72,9 @@ public class FuzzyQueryNodeProcessor extends QueryNodeProcessorImpl {
         if (fuzzyNode.getSimilarity() < 0) {
           fuzzyNode.setSimilarity(fuzzyConfig.getMinSimilarity());
         }
-        
+        fuzzyNode.setMaxExpansions(fuzzyConfig.getMaxExpansions());
+        fuzzyNode.setTranspositions(fuzzyConfig.isTranspositions());
+
       } else if (fuzzyNode.getSimilarity() < 0) {
         throw new IllegalArgumentException("No FUZZY_CONFIG set in the config");
       }

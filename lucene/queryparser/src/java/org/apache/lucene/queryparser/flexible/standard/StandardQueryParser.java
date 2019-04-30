@@ -291,7 +291,43 @@ public class StandardQueryParser extends QueryParserHelper implements CommonQuer
     fuzzyConfig.setPrefixLength(fuzzyPrefixLength);
     
   }
-  
+
+  /**
+   * Set the max expansions for fuzzy queries. Default is 50.
+   *
+   * @param fuzzyMaxExpansions The fuzzyMaxExpansions to set.
+   */
+  @Override
+  public void setFuzzyMaxExpansions(int fuzzyMaxExpansions) {
+    QueryConfigHandler config = getQueryConfigHandler();
+    FuzzyConfig fuzzyConfig = config.get(ConfigurationKeys.FUZZY_CONFIG);
+
+    if (fuzzyConfig == null) {
+      fuzzyConfig = new FuzzyConfig();
+      config.set(ConfigurationKeys.FUZZY_CONFIG, fuzzyConfig);
+    }
+
+    fuzzyConfig.setMaxExpansions(fuzzyMaxExpansions);
+  }
+
+  /**
+   * Set the transpositions for fuzzy queries. Default is true.
+   *
+   * @param fuzzyTranspositions The fuzzyTranspositions to set.
+   */
+  @Override
+  public void setFuzzyTranspositions(boolean fuzzyTranspositions) {
+    QueryConfigHandler config = getQueryConfigHandler();
+    FuzzyConfig fuzzyConfig = config.get(ConfigurationKeys.FUZZY_CONFIG);
+
+    if (fuzzyConfig == null) {
+      fuzzyConfig = new FuzzyConfig();
+      config.set(ConfigurationKeys.FUZZY_CONFIG, fuzzyConfig);
+    }
+
+    fuzzyConfig.setTranspositions(fuzzyTranspositions);
+  }
+
   public void setPointsConfigMap(Map<String,PointsConfig> pointsConfigMap) {
     getQueryConfigHandler().set(ConfigurationKeys.POINTS_CONFIG_MAP, pointsConfigMap);
   }
@@ -403,7 +439,39 @@ public class StandardQueryParser extends QueryParserHelper implements CommonQuer
       return phraseSlop;
     }
   }
-  
+
+  /**
+   * Get the maximum expansions for fuzzy queries.
+   *
+   * @return Returns the maxExpansions.
+   */
+  @Override
+  public int getFuzzyMaxExpansions() {
+    FuzzyConfig fuzzyConfig = getQueryConfigHandler().get(ConfigurationKeys.FUZZY_CONFIG);
+
+    if (fuzzyConfig == null) {
+      return FuzzyQuery.defaultMaxExpansions;
+    } else {
+      return fuzzyConfig.getMaxExpansions();
+    }
+  }
+
+  /**
+   * Get the transpositions for fuzzy queries.
+   *
+   * @return Returns the transpositions.
+   */
+  @Override
+  public boolean isTranspositions() {
+    FuzzyConfig fuzzyConfig = getQueryConfigHandler().get(ConfigurationKeys.FUZZY_CONFIG);
+
+    if (fuzzyConfig == null) {
+      return FuzzyQuery.defaultTranspositions;
+    } else {
+      return fuzzyConfig.isTranspositions();
+    }
+  }
+
   /**
    * Set the minimum similarity for fuzzy queries. Default is defined on
    * {@link FuzzyQuery#defaultMinSimilarity}.

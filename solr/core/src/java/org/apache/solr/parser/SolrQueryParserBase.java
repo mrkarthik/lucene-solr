@@ -51,6 +51,8 @@ import org.apache.lucene.util.automaton.Operations;
 import org.apache.solr.analysis.ReversedWildcardFilterFactory;
 import org.apache.solr.analysis.TokenizerChain;
 import org.apache.solr.common.SolrException;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.parser.QueryParser.Operator;
 import org.apache.solr.query.FilterQuery;
 import org.apache.solr.schema.FieldType;
@@ -63,6 +65,9 @@ import org.apache.solr.search.SolrConstantScoreQuery;
 import org.apache.solr.search.SyntaxError;
 
 import static org.apache.solr.parser.SolrQueryParserBase.SynonymQueryStyle.AS_SAME_TERM;
+import static org.apache.solr.common.params.CommonParams.FUZZY_PREFIX_LENGTH;
+import static org.apache.solr.common.params.CommonParams.FUZZY_MAX_EXPANSIONS;
+import static org.apache.solr.common.params.CommonParams.FUZZY_TRANSPOSITIONS;
 
 /** This class is overridden by QueryParser in QueryParser.jj
  * and acts to separate the majority of the Java code from the .jj grammar file.
@@ -131,6 +136,8 @@ public abstract class SolrQueryParserBase extends QueryBuilder {
   int phraseSlop = 0;     // default slop for phrase queries
   float fuzzyMinSim = FuzzyQuery.defaultMinSimilarity;
   int fuzzyPrefixLength = FuzzyQuery.defaultPrefixLength;
+  int fuzzyMaxExpansions = FuzzyQuery.defaultMaxExpansions;
+  boolean fuzzyTranspositions = FuzzyQuery.defaultTranspositions;
 
   boolean autoGeneratePhraseQueries = false;
   boolean allowSubQueryParsing = false;
@@ -330,6 +337,11 @@ public abstract class SolrQueryParserBase extends QueryBuilder {
    * @return Returns the fuzzyPrefixLength.
    */
   public int getFuzzyPrefixLength() {
+    SolrParams params = parser != null ? parser.getParams() : null;
+    if (params != null) {
+      return params.getInt(FUZZY_PREFIX_LENGTH, fuzzyPrefixLength);
+    }
+
     return fuzzyPrefixLength;
   }
 
@@ -339,6 +351,52 @@ public abstract class SolrQueryParserBase extends QueryBuilder {
    */
   public void setFuzzyPrefixLength(int fuzzyPrefixLength) {
     this.fuzzyPrefixLength = fuzzyPrefixLength;
+  }
+
+  /**
+   * Get the maximum expansions for fuzzy queries.
+   *
+   * @return Returns the maxExpansions.
+   */
+  public int getFuzzyMaxExpansions() {
+    SolrParams params = parser != null ? parser.getParams() : null;
+    if (params != null) {
+      return params.getInt(FUZZY_MAX_EXPANSIONS, fuzzyMaxExpansions);
+    }
+
+    return fuzzyMaxExpansions;
+  }
+
+  /**
+   * Set the max expansions for fuzzy queries. Default is 50.
+   *
+   * @param fuzzyMaxExpansions The fuzzyMaxExpansions to set.
+   */
+  public void setFuzzyMaxExpansions(int fuzzyMaxExpansions) {
+    this.fuzzyMaxExpansions = fuzzyMaxExpansions;
+  }
+
+  /**
+   * Get the transpositions for fuzzy queries.
+   *
+   * @return Returns the transpositions.
+   */
+  public boolean isFuzzyTranspositions() {
+    SolrParams params = parser != null ? parser.getParams() : null;
+    if (params != null) {
+      return params.getBool(FUZZY_TRANSPOSITIONS, fuzzyTranspositions);
+    }
+
+    return fuzzyTranspositions;
+  }
+
+  /**
+   * Set the transpositions for fuzzy queries. Default is true.
+   *
+   * @param fuzzyTranspositions The fuzzyTranspositions to set.
+   */
+  public void setFuzzyTranspositions(boolean fuzzyTranspositions) {
+    this.fuzzyTranspositions = fuzzyTranspositions;
   }
 
   /**
@@ -625,15 +683,14 @@ public abstract class SolrQueryParserBase extends QueryBuilder {
    * Builds a new FuzzyQuery instance
    * @param term Term
    * @param minimumSimilarity minimum similarity
-   * @param prefixLength prefix length
    * @return new FuzzyQuery Instance
    */
-  protected Query newFuzzyQuery(Term term, float minimumSimilarity, int prefixLength) {
+  protected Query newFuzzyQuery(Term term, float minimumSimilarity) {
     // FuzzyQuery doesn't yet allow constant score rewrite
     String text = term.text();
     int numEdits = FuzzyQuery.floatToEdits(minimumSimilarity,
         text.codePointCount(0, text.length()));
-    return new FuzzyQuery(term,numEdits,prefixLength);
+    return new FuzzyQuery(term, numEdits, getFuzzyPrefixLength(), getFuzzyMaxExpansions(), isFuzzyTranspositions());
   }
 
   /**
@@ -1244,7 +1301,7 @@ public abstract class SolrQueryParserBase extends QueryBuilder {
   protected Query getFuzzyQuery(String field, String termStr, float minSimilarity) throws SyntaxError {
     termStr = analyzeIfMultitermTermText(field, termStr, schema.getFieldType(field));
     Term t = new Term(field, termStr);
-    return newFuzzyQuery(t, minSimilarity, getFuzzyPrefixLength());
+    return newFuzzyQuery(t, minSimilarity);
   }
 
   // called from parser

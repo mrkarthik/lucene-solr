@@ -294,5 +294,11 @@ public interface CommonParams {
 
   String JAVABIN_MIME = "application/javabin";
 
+  /**
+   * Request parameters for Fuzzy Query
+   */
+  String FUZZY_PREFIX_LENGTH  = "fuzzy.prefixLength";
+  String FUZZY_MAX_EXPANSIONS = "fuzzy.maxExpansions";
+  String FUZZY_TRANSPOSITIONS = "fuzzy.transpositions";
 }
 

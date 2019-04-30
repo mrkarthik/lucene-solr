@@ -83,7 +83,23 @@ public interface CommonQueryParserConfiguration {
    *          The fuzzyPrefixLength to set.
    */
   public void setFuzzyPrefixLength(int fuzzyPrefixLength);
-  
+
+  /**
+   * Set the max expansions for fuzzy queries. Default is 50.
+   *
+   * @param fuzzyMaxExpansions
+   *          The fuzzyMaxExpansions to set.
+   */
+  public void setFuzzyMaxExpansions(int fuzzyMaxExpansions);
+
+  /**
+   * Set the transpositions for fuzzy queries. Default is true.
+   *
+   * @param fuzzyTranspositions
+   *          The fuzzyTranspositions to set.
+   */
+  public void setFuzzyTranspositions(boolean fuzzyTranspositions);
+
   /**
    * Set locale used by date range parsing.
    */
@@ -122,7 +138,19 @@ public interface CommonQueryParserConfiguration {
    * @return Returns the fuzzyPrefixLength.
    */
   public int getFuzzyPrefixLength();
-  
+
+  /**
+   * Get the maximum expansions for fuzzy queries.
+   * @return Returns the maxExpansions.
+   */
+  public int getFuzzyMaxExpansions();
+
+  /**
+   * Get the transpositions for fuzzy queries.
+   * @return Returns the transpositions.
+   */
+  public boolean isTranspositions();
+
   /**
    * Gets the default slop for phrases.
    */

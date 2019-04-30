@@ -25,8 +25,9 @@ import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 public class FuzzyQueryNode extends FieldQueryNode {
 
   private float similarity;
-
   private int prefixLength;
+  private int maxExpansions;
+  private boolean transpositions;
 
   /**
    * @param field
@@ -94,5 +95,21 @@ public class FuzzyQueryNode extends FieldQueryNode {
    */
   public float getSimilarity() {
     return this.similarity;
+  }
+
+  public int getMaxExpansions() {
+    return maxExpansions;
+  }
+
+  public void setMaxExpansions(int maxExpansions) {
+    this.maxExpansions = maxExpansions;
+  }
+
+  public boolean isTranspositions() {
+    return transpositions;
+  }
+
+  public void setTranspositions(boolean transpositions) {
+    this.transpositions = transpositions;
   }
 }

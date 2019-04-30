@@ -22,12 +22,14 @@ import org.apache.lucene.search.FuzzyQuery;
  * Configuration parameters for {@link FuzzyQuery}s
  */
 public class FuzzyConfig {
-  
-  private int prefixLength = FuzzyQuery.defaultPrefixLength;
 
+  private int prefixLength = FuzzyQuery.defaultPrefixLength;
   private float minSimilarity = FuzzyQuery.defaultMinSimilarity;
-  
-  public FuzzyConfig() {}
+  private int maxExpansions = FuzzyQuery.defaultMaxExpansions;
+  private boolean transpositions = FuzzyQuery.defaultTranspositions;
+
+  public FuzzyConfig() {
+  }
 
   public int getPrefixLength() {
     return prefixLength;
@@ -44,5 +46,20 @@ public class FuzzyConfig {
   public void setMinSimilarity(float minSimilarity) {
     this.minSimilarity = minSimilarity;
   }
-  
+
+  public int getMaxExpansions() {
+    return maxExpansions;
+  }
+
+  public void setMaxExpansions(int maxExpansions) {
+    this.maxExpansions = maxExpansions;
+  }
+
+  public boolean isTranspositions() {
+    return transpositions;
+  }
+
+  public void setTranspositions(boolean transpositions) {
+    this.transpositions = transpositions;
+  }
 }

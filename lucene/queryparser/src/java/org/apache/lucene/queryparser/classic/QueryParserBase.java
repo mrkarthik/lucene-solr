@@ -18,7 +18,13 @@ package org.apache.lucene.queryparser.classic;
 
 import java.io.StringReader;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,9 +33,22 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser.Operator;
 import org.apache.lucene.queryparser.flexible.standard.CommonQueryParserConfiguration;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BooleanQuery.TooManyClauses;
+import org.apache.lucene.search.BoostQuery;
+import org.apache.lucene.search.FuzzyQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.MultiPhraseQuery;
+import org.apache.lucene.search.MultiTermQuery;
+import org.apache.lucene.search.PhraseQuery;
+import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.RegexpQuery;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermRangeQuery;
+import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.QueryBuilder;
@@ -67,6 +86,8 @@ public abstract class QueryParserBase extends QueryBuilder implements CommonQuer
   int phraseSlop = 0;
   float fuzzyMinSim = FuzzyQuery.defaultMinSimilarity;
   int fuzzyPrefixLength = FuzzyQuery.defaultPrefixLength;
+  int fuzzyMaxExpansions = FuzzyQuery.defaultMaxExpansions;
+  boolean fuzzyTranspositions = FuzzyQuery.defaultTranspositions;
   Locale locale = Locale.getDefault();
   TimeZone timeZone = TimeZone.getDefault();
 
@@ -172,6 +193,46 @@ public abstract class QueryParserBase extends QueryBuilder implements CommonQuer
   @Override
   public int getFuzzyPrefixLength() {
     return fuzzyPrefixLength;
+  }
+
+  /**
+   * Set the max expansions for fuzzy queries. Default is 50.
+   *
+   * @param fuzzyMaxExpansions The fuzzyMaxExpansions to set.
+   */
+  @Override
+  public void setFuzzyMaxExpansions(int fuzzyMaxExpansions) {
+    this.fuzzyMaxExpansions = fuzzyMaxExpansions;
+  }
+
+  /**
+   * Set the transpositions for fuzzy queries. Default is true.
+   *
+   * @param fuzzyTranspositions The fuzzyTranspositions to set.
+   */
+  @Override
+  public void setFuzzyTranspositions(boolean fuzzyTranspositions) {
+    this.fuzzyTranspositions = fuzzyTranspositions;
+  }
+
+  /**
+   * Get the maximum expansions for fuzzy queries.
+   *
+   * @return Returns the maxExpansions.
+   */
+  @Override
+  public int getFuzzyMaxExpansions() {
+    return fuzzyMaxExpansions;
+  }
+
+  /**
+   * Get the transpositions for fuzzy queries.
+   *
+   * @return Returns the transpositions.
+   */
+  @Override
+  public boolean isTranspositions() {
+    return fuzzyTranspositions;
   }
 
   /**
@@ -585,15 +646,14 @@ public abstract class QueryParserBase extends QueryBuilder implements CommonQuer
    * Builds a new FuzzyQuery instance
    * @param term Term
    * @param minimumSimilarity minimum similarity
-   * @param prefixLength prefix length
    * @return new FuzzyQuery Instance
    */
-  protected Query newFuzzyQuery(Term term, float minimumSimilarity, int prefixLength) {
+  protected Query newFuzzyQuery(Term term, float minimumSimilarity) {
     // FuzzyQuery doesn't yet allow constant score rewrite
     String text = term.text();
     int numEdits = FuzzyQuery.floatToEdits(minimumSimilarity, 
         text.codePointCount(0, text.length()));
-    return new FuzzyQuery(term,numEdits,prefixLength);
+    return new FuzzyQuery(term,numEdits, getFuzzyPrefixLength(), getFuzzyMaxExpansions(), isTranspositions());
   }
 
   /**
@@ -807,7 +867,7 @@ public abstract class QueryParserBase extends QueryBuilder implements CommonQuer
   {
     BytesRef term = getAnalyzer().normalize(field, termStr);
     Term t = new Term(field, term);
-    return newFuzzyQuery(t, minSimilarity, fuzzyPrefixLength);
+    return newFuzzyQuery(t, minSimilarity);
   }
 
 

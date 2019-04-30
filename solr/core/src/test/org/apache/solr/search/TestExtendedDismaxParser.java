@@ -2044,7 +2044,7 @@ public class TestExtendedDismaxParser extends SolrTestCaseJ4 {
               Term subTerm = ((TermQuery)subQ).getTerm(); 
               if (frequentlyMisspelledWords.contains(subTerm.text())) {
                 rewrittenSubQ = true;
-                Query fuzzySubQ = newFuzzyQuery(subTerm, MIN_SIMILARITY, getFuzzyPrefixLength());
+                Query fuzzySubQ = newFuzzyQuery(subTerm, MIN_SIMILARITY);
                 clause = newBooleanClause(fuzzySubQ, clause.getOccur());
               } 
             } 

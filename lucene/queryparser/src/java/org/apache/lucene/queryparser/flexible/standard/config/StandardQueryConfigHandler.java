@@ -137,8 +137,12 @@ public class StandardQueryConfigHandler extends QueryConfigHandler {
      * 
      * @see StandardQueryParser#setFuzzyMinSim(float)
      * @see StandardQueryParser#setFuzzyPrefixLength(int)
+     * @see StandardQueryParser#setFuzzyMaxExpansions(int)
+     * @see StandardQueryParser#setFuzzyTranspositions(boolean)
      * @see StandardQueryParser#getFuzzyMinSim()
      * @see StandardQueryParser#getFuzzyPrefixLength()
+     * @see StandardQueryParser#getFuzzyMaxExpansions()
+     * @see StandardQueryParser#isTranspositions()
      */
     final public static ConfigurationKey<FuzzyConfig> FUZZY_CONFIG = ConfigurationKey.newInstance();
     
